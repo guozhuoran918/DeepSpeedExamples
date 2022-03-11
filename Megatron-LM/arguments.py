@@ -302,7 +302,8 @@ def add_data_args(parser):
                        help='Maximum number of predictions to use per sequence.'
                        'Defaults to math.ceil(`--seq-length`*.15/10)*10.'
                        'MUST BE SPECIFIED IF `--use-tfrecords` is True.')
-
+    group.add_argument('--max_len',type = int,default = 512)
+    group.add_argument('--summary_len',type = int,default = None)
     return parser
 
 def get_args():

@@ -2,6 +2,7 @@
 
 import json
 import os
+from attr import dataclass
 import pandas as pd
 import numpy as np
 import torch
@@ -11,7 +12,6 @@ from torch.utils.data import Dataset
 import mpu
 from data_utils.samplers import DistributedBatchSampler
 from transformers import T5Tokenizer
-
 def make_tf5_dataloaders(args):
 
     # Data parallel arguments.
@@ -19,8 +19,9 @@ def make_tf5_dataloaders(args):
     rank = mpu.get_data_parallel_rank()
     global_batch_size = args.batch_size * world_size
     num_workers = args.num_workers
-    tokenizer = T5Tokenizer.from_pretrained("t5-base")
-
+    tokenizer = T5Tokenizer.from_pretrained("t5-large")
+    tokenizer.add_special_tokens({'eos_token':'[EOS]'})
+    #see https://github.com/huggingface/transformers/issues/5142 for checking the eos_token issues
     def make_data_loader_(dataset_path):
         # Build the dataset.
         dataframe= pd.read_csv(dataset_path)
@@ -40,6 +41,7 @@ def make_tf5_dataloaders(args):
                                            num_workers=num_workers,
                                            pin_memory=True)
 
+
     train = make_data_loader_(args.train_data_path)
     valid = make_data_loader_(args.val_data_path)
     test = make_data_loader_(args.test_data_path)
@@ -56,7 +58,7 @@ def make_tf5_dataloaders(args):
         args.do_test = True
 
     # Tokenizer.
-    eod_token = tokenizer.encoder['<|endoftext|>']
+    eod_token = tokenizer.eos_token_id
     num_tokens = eod_token + 1
 
     return (train, valid, test), num_tokens, eod_token

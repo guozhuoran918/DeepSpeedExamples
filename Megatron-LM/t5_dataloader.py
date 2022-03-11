@@ -2,7 +2,6 @@
 
 import json
 import os
-from attr import dataclass
 import pandas as pd
 import numpy as np
 import torch

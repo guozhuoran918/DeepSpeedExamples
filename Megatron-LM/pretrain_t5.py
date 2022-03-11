@@ -196,7 +196,7 @@ def get_batch(data_iterator, args, timers,tokenizer):
     shard reset mask of the same dimensions is also returned.
     '''
     # Items and their type.
-    keys = ['text']
+    keys = ['target_ids','source_ids','source_mask']
     datatype = torch.int64
 
     # Broadcast data.
@@ -231,12 +231,12 @@ def forward_step(data_iterator, model, args, timers,tokenizer):
 
     # Forward model.
     output = model(input_ids = ids, attention_mask = mask, decoder_input_ids=y_ids, labels=lm_labels)
-    losses = mpu.vocab_parallel_cross_entropy(output.contiguous().float(),
-                                              lm_labels)
-    loss_mask = loss_mask.view(-1)
-    loss = torch.sum(losses.view(-1) * loss_mask) / loss_mask.sum()
+    #losses = mpu.vocab_parallel_cross_entropy(output.contiguous().float(),
+    #                                              lm_labels)
+    #loss_mask = loss_mask.view(-1)
+    #loss = torch.sum(losses.view(-1) * loss_mask) / loss_mask.sum()
 
-    return loss
+    return output[0] 
 
 
 def backward_step(optimizer, model, lm_loss, args, timers):

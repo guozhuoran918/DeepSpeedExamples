@@ -12,7 +12,7 @@ script_dir=$(dirname $script_path)
 config_json="$script_dir/ds_zero-offload_10B_config.json"
 gpt_options=" \
        --model-parallel-size ${MP_SIZE} \
-       --batch-size 10 \
+       --batch-size 8 \
        --train-iters 100 \
        --lazy-loader \
        --distributed-backend nccl \
@@ -25,6 +25,7 @@ gpt_options=" \
        --checkpoint-activations \
        --deepspeed-activation-checkpointing \
        --fp16 \
+       --finetune \
        --log-interval 1 \
        --max_len 512 \
        --summary_len 150 \

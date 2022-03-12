@@ -100,10 +100,13 @@ def get_optimizer(model, args):
     """Set up the optimizer."""
 
     # Build parameter groups (weight decay and non-decay).
-    while isinstance(model, (DDP, FP16_Module)):
-        model = model.module
+    #while isinstance(model, (DDP, FP16_Module)):
+       # model = model.module
     param_groups = gpt2_get_params_for_weight_decay_optimization(model)
-
+    #print(param_groups)
+    #print("====no param groups===")
+    #print(no_param_groups)
+   # print(param_groups)
     # Add model parallel attribute if it is not set.
     for param_group in param_groups:
         for param in param_group['params']:
@@ -115,7 +118,7 @@ def get_optimizer(model, args):
                          lr=args.lr, weight_decay=args.weight_decay)
 
     print(f'Optimizer = {optimizer.__class__.__name__}')
-
+    print(optimizer)
     if args.deepspeed:
         return optimizer, param_groups
 

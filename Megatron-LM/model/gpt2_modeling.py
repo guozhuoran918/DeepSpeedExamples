@@ -106,10 +106,18 @@ class GPT2Model(torch.nn.Module):
 
 
 def gpt2_get_params_for_weight_decay_optimization(module):
-
+    #for name,module in module.named_modules():
+       # print(name)
+    no_decay = ["bias","LayerNorm.weight"]
     weight_decay_params = {'params': []}
     no_weight_decay_params = {'params': [], 'weight_decay': 0.0}
+    weight_decay_params['params'] = [p for n, p in module.named_parameters() if not any(nd in n for nd in no_decay)]
+    no_weight_decay_params['params'] = [p for n, p in module.named_parameters() if any(nd in n for nd in no_decay)]
+    '''
     for module_ in module.modules():
+        for n,p in list(module_._parameters.items()):
+            if p is None:
+                print(n)
         if isinstance(module_, (mpu.LayerNorm, torch.nn.LayerNorm)):
             no_weight_decay_params['params'].extend(
                 [p for p in list(module_._parameters.values())
@@ -121,5 +129,5 @@ def gpt2_get_params_for_weight_decay_optimization(module):
             no_weight_decay_params['params'].extend(
                 [p for n, p in list(module_._parameters.items())
                  if p is not None and n == 'bias'])
-
+    '''
     return weight_decay_params, no_weight_decay_params
